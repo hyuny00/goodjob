@@ -1,0 +1,39 @@
+server:
+  port: 8550
+
+spring:
+  profiles:
+    active: prod
+    
+
+---
+spring:
+  config:
+    activate: 
+      on-profile: dev
+      
+sourceFilePath : "D:/KOSMES_DEV/csv/"
+destinationDirectory : "D:/KOSMES_DEV/csv2/"
+clientIp : 127.0.0.1
+      
+
+---
+spring:
+  config:
+    activate: 
+      on-profile: test
+
+            
+---
+spring:
+  config:
+    activate: 
+      on-profile: prod
+
+
+sourceFilePath : "/home/sems24/temp/"
+
+destinationDirectory : "/home/sems24/files/send/"
+
+
+clientIp : 163.163.30.9
