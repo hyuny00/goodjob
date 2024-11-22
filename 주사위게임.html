@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Dice Game with Dots</title>
+
+
+  <style>
+ body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  margin-top: 50px;
+}
+
+.dice-container {
+  perspective: 800px;  /* 입체감을 더 강하게 */
+}
+
+.dice {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg) rotateY(0deg);
+  transition: transform 0.5s ease-in-out;  /* 멈출 때 부드럽게 보이도록 */
+}
+
+.face {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f2f2;
+  border: 2px solid #333;
+  border-radius: 10px;  /* 각 면을 둥글게 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);  /* 입체감을 위한 그림자 */
+}
+
+.face .dot {
+  width: 15px;
+  height: 15px;
+  background-color: black;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+.top-left { top: 20%; left: 20%; }
+.top-right { top: 20%; right: 20%; }
+.bottom-left { bottom: 20%; left: 20%; }
+.bottom-right { bottom: 20%; right: 20%; }
+.middle-left { top: 50%; left: 20%; transform: translateY(-50%); }
+.middle-right { top: 50%; right: 20%; transform: translateY(-50%); }
+
+/* 각 주사위 면의 위치 */
+.front  { transform: translateZ(50px); }
+.back   { transform: rotateY(180deg) translateZ(50px); }
+.right  { transform: rotateY(90deg) translateZ(50px); }
+.left   { transform: rotateY(-90deg) translateZ(50px); }
+.top    { transform: rotateX(90deg) translateZ(50px); }
+.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+.buttons button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+
+
+</style>
+</head>
+<body>
+  <h1>3D 점 주사위 게임 🎲</h1>
+  <div class="dice-container">
+    <div class="dice" id="dice">
+      <div class="face front"><div class="dot center"></div></div>
+      <div class="face back">
+        <div class="dot top-left"></div>
+        <div class="dot bottom-right"></div>
+      </div>
+      <div class="face right">
+        <div class="dot top-left"></div>
+        <div class="dot center"></div>
+        <div class="dot bottom-right"></div>
+      </div>
+      <div class="face left">
+        <div class="dot top-left"></div>
+        <div class="dot top-right"></div>
+        <div class="dot bottom-left"></div>
+        <div class="dot bottom-right"></div>
+      </div>
+      <div class="face top">
+        <div class="dot top-left"></div>
+        <div class="dot top-right"></div>
+        <div class="dot center"></div>
+        <div class="dot bottom-left"></div>
+        <div class="dot bottom-right"></div>
+      </div>
+      <div class="face bottom">
+        <div class="dot top-left"></div>
+        <div class="dot top-right"></div>
+        <div class="dot middle-left"></div>
+        <div class="dot middle-right"></div>
+        <div class="dot bottom-left"></div>
+        <div class="dot bottom-right"></div>
+      </div>
+    </div>
+  </div>
+  <div class="buttons">
+    <button onclick="startDice()">시작</button>
+    <button onclick="stopDice()">스톱</button>
+  </div>
+  <p id="result"></p>
+  <script >
+let diceInterval;
+let rotationX = 0;
+let rotationY = 0;
+
+function startDice() {
+  const dice = document.getElementById("dice");
+
+  // 일정한 방향으로 빠르게 회전하는 애니메이션
+  diceInterval = setInterval(() => {
+    rotationX += 20;  // X축 방향으로 계속 회전
+    rotationY += 20;  // Y축 방향으로도 함께 회전
+    dice.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+  }, 50);  // 빠르게 회전하는 효과
+
+  document.querySelector(".buttons button:nth-child(1)").disabled = true;
+  document.querySelector(".buttons button:nth-child(2)").disabled = false;
+
+}
+
+function stopDice() {
+  clearInterval(diceInterval);
+
+  const dice = document.getElementById("dice");
+  const result = document.getElementById("result");
+
+  // 최종 주사위 면을 랜덤으로 선택
+  const finalFace = Math.floor(Math.random() * 6) + 1;
+
+  // 최종 면에 따라 주사위의 각도를 설정하여 해당 면이 위로 오게 함
+  let finalTransform;
+  switch (finalFace) {
+    case 1:  // 앞면이 위로 향함
+      finalTransform = "rotateX(0deg) rotateY(0deg)";
+      break;
+    case 2:  // 뒷면이 위로 향함
+      finalTransform = "rotateX(180deg) rotateY(0deg)";
+      break;
+    case 3:  // 오른쪽 면이 위로 향함
+      finalTransform = "rotateX(0deg) rotateY(-90deg)";
+      break;
+    case 4:  // 왼쪽 면이 위로 향함
+      finalTransform = "rotateX(0deg) rotateY(90deg)";
+      break;
+    case 5:  // 윗면이 위로 향함
+      finalTransform = "rotateX(-90deg) rotateY(0deg)";
+      break;
+    case 6:  // 아랫면이 위로 향함
+      finalTransform = "rotateX(90deg) rotateY(0deg)";
+      break;
+  }
+
+  // 주사위를 최종 회전 상태로 설정하고 위쪽 면 표시
+  dice.style.transition = "transform 0.5s ease";
+  dice.style.transform = finalTransform;
+  result.textContent = `위로 향한 숫자: ${finalFace}`;
+
+  // 버튼 활성화 상태 변경
+  document.querySelector(".buttons button:nth-child(1)").disabled = false;
+  document.querySelector(".buttons button:nth-child(2)").disabled = true;
+}
+
+
+  </script>
+</body>
+</html>
